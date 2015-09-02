@@ -9,10 +9,10 @@ EXE = pem2mincrypt
 	$(CC) -c -o $@ $< $(CFLAGS)
 
 $(EXE): $(OBJ)
-	gcc $(LDFLAGS) -o $(EXE) $(OBJ)
+	gcc -o $(EXE) $(OBJ) $(LDFLAGS)
 
 .PHONY: clean
 
 clean: 
-	rm $(OBJ) $(EXE)
+	rm -f $(OBJ) $(EXE)
 
