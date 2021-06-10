@@ -36,6 +36,7 @@
 #undef RSA_verify
 
 #include <openssl/objects.h>
+#include <openssl/opensslv.h>
 #include <openssl/pem.h>
 #include <openssl/rsa.h>
 
@@ -64,7 +65,11 @@ static int RSA_to_RSAPublicKey(RSA *rsa, RSAPublicKey *pkey)
     }
 
     BN_set_bit(r32, 32);
+#if OPENSSL_VERSION_NUMBER >= 0x10100000L
+    BN_copy(n, RSA_get0_n(rsa));
+#else
     BN_copy(n, rsa->n);
+#endif
     BN_set_bit(r, RSANUMWORDS * 32);
     BN_mod_sqr(rr, r, n, ctx);
     BN_div(NULL, rem, n, r32, ctx);
@@ -78,7 +83,11 @@ static int RSA_to_RSAPublicKey(RSA *rsa, RSAPublicKey *pkey)
         BN_div(n, rem, n, r32, ctx);
         pkey->n[i] = BN_get_word(rem);
     }
+#if OPENSSL_VERSION_NUMBER >= 0x10100000L
+    pkey->exponent = BN_get_word(RSA_get0_e(rsa));
+#else
     pkey->exponent = BN_get_word(rsa->e);
+#endif
 
 out:
     BN_free(n0inv);
